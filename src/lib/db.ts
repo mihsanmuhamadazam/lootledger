@@ -10,22 +10,22 @@ interface LootLedgerDB extends DBSchema {
   valorantSkins: {
     key: string;
     value: ValorantSkin;
-    indexes: { 'by-userId': string };
+    indexes: { 'by-odId': string };
   };
   csgoSkins: {
     key: string;
     value: CSGOSkin;
-    indexes: { 'by-userId': string };
+    indexes: { 'by-odId': string };
   };
   subscriptions: {
     key: string;
     value: GamingSubscription;
-    indexes: { 'by-userId': string };
+    indexes: { 'by-odId': string };
   };
   gameWorth: {
     key: string;
     value: GameWorthEntry;
-    indexes: { 'by-userId': string };
+    indexes: { 'by-odId': string };
   };
   friends: {
     key: string;
@@ -54,25 +54,25 @@ export async function getDB(): Promise<IDBPDatabase<LootLedgerDB>> {
       // Valorant Skins store
       if (!db.objectStoreNames.contains('valorantSkins')) {
         const valStore = db.createObjectStore('valorantSkins', { keyPath: 'id' });
-        valStore.createIndex('by-userId', 'userId');
+        valStore.createIndex('by-odId', 'odId');
       }
 
       // CS:GO Skins store
       if (!db.objectStoreNames.contains('csgoSkins')) {
         const csgoStore = db.createObjectStore('csgoSkins', { keyPath: 'id' });
-        csgoStore.createIndex('by-userId', 'userId');
+        csgoStore.createIndex('by-odId', 'odId');
       }
 
       // Subscriptions store
       if (!db.objectStoreNames.contains('subscriptions')) {
         const subStore = db.createObjectStore('subscriptions', { keyPath: 'id' });
-        subStore.createIndex('by-userId', 'userId');
+        subStore.createIndex('by-odId', 'odId');
       }
 
       // Game Worth Calculator store
       if (!db.objectStoreNames.contains('gameWorth')) {
         const gameStore = db.createObjectStore('gameWorth', { keyPath: 'id' });
-        gameStore.createIndex('by-userId', 'userId');
+        gameStore.createIndex('by-odId', 'odId');
       }
 
       // Friends store
@@ -139,7 +139,7 @@ export async function createValorantSkin(skin: ValorantSkin): Promise<ValorantSk
 
 export async function getValorantSkinsByUserId(userId: string): Promise<ValorantSkin[]> {
   const db = await getDB();
-  return db.getAllFromIndex('valorantSkins', 'by-userId', userId);
+  return db.getAllFromIndex('valorantSkins', 'by-odId', userId);
 }
 
 export async function updateValorantSkin(skin: ValorantSkin): Promise<ValorantSkin> {
@@ -162,7 +162,7 @@ export async function createCSGOSkin(skin: CSGOSkin): Promise<CSGOSkin> {
 
 export async function getCSGOSkinsByUserId(userId: string): Promise<CSGOSkin[]> {
   const db = await getDB();
-  return db.getAllFromIndex('csgoSkins', 'by-userId', userId);
+  return db.getAllFromIndex('csgoSkins', 'by-odId', userId);
 }
 
 export async function updateCSGOSkin(skin: CSGOSkin): Promise<CSGOSkin> {
@@ -185,7 +185,7 @@ export async function createSubscription(sub: GamingSubscription): Promise<Gamin
 
 export async function getSubscriptionsByUserId(userId: string): Promise<GamingSubscription[]> {
   const db = await getDB();
-  return db.getAllFromIndex('subscriptions', 'by-userId', userId);
+  return db.getAllFromIndex('subscriptions', 'by-odId', userId);
 }
 
 export async function updateSubscription(sub: GamingSubscription): Promise<GamingSubscription> {
@@ -208,7 +208,7 @@ export async function createGameWorthEntry(entry: GameWorthEntry): Promise<GameW
 
 export async function getGameWorthEntriesByUserId(userId: string): Promise<GameWorthEntry[]> {
   const db = await getDB();
-  return db.getAllFromIndex('gameWorth', 'by-userId', userId);
+  return db.getAllFromIndex('gameWorth', 'by-odId', userId);
 }
 
 export async function updateGameWorthEntry(entry: GameWorthEntry): Promise<GameWorthEntry> {

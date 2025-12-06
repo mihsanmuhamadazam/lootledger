@@ -10,7 +10,7 @@ export interface User {
 // ============ VALORANT ============
 export interface ValorantSkin {
   id: string;
-  userId: string;
+  odId: string; // owner user ID
   skinId: string; // Reference to skin database
   name: string;
   weapon: string;
@@ -18,7 +18,7 @@ export interface ValorantSkin {
   tier: ValorantTier;
   variant?: string;
   vpCost: number;
-  pricePaidRM: number; // Changed to Malaysian Ringgit
+  pricePaidRM: number; // Malaysian Ringgit
   acquiredDate: string;
   createdAt: string;
 }
@@ -36,15 +36,15 @@ export const VALORANT_TIERS: { value: ValorantTier; label: string; color: string
 // ============ CS:GO / CS2 ============
 export interface CSGOSkin {
   id: string;
-  userId: string;
+  odId: string; // owner user ID
   name: string;
   weapon: string;
   skinName: string;
   wear: CSGOWear;
   statTrak: boolean;
   floatValue?: number;
-  pricePaidRM: number; // Changed to Malaysian Ringgit
-  currentMarketPriceRM: number; // Changed to Malaysian Ringgit
+  pricePaidRM: number; // Malaysian Ringgit
+  currentMarketPriceRM: number; // Malaysian Ringgit
   acquiredDate: string;
   createdAt: string;
 }
@@ -70,10 +70,10 @@ export const CSGO_WEAPONS = [
 // ============ GAMING SUBSCRIPTIONS ============
 export interface GamingSubscription {
   id: string;
-  userId: string;
+  odId: string; // owner user ID
   service: SubscriptionService;
   tier: string;
-  monthlyCostRM: number; // Changed to Malaysian Ringgit
+  monthlyCostRM: number; // Malaysian Ringgit
   billingCycle: 'monthly' | 'quarterly' | 'yearly';
   startDate: string;
   renewalDate: string;
@@ -114,7 +114,7 @@ export const SUBSCRIPTION_SERVICES: { value: SubscriptionService; label: string;
 // ============ GAME WORTH CALCULATOR ============
 export interface GameWorthEntry {
   id: string;
-  userId: string;
+  odId: string; // owner user ID
   gameName: string;
   priceRM: number;
   hoursToComplete: number;
@@ -136,7 +136,7 @@ export const WORTH_RATINGS = [
 // ============ FRIENDS & LEADERBOARD ============
 export interface Friend {
   id: string;
-  odId: string;
+  odId: string; // owner user ID
   odName: string;
   odShareCode: string;
   friendId: string;
