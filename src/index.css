@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Rajdhani', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+}
+
+@layer components {
+  .gradient-text {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c471f5 50%, #7b68ee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .gradient-text-valorant {
+    background: linear-gradient(135deg, #ff4655 0%, #ff6b9d 50%, #00c8c8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .gradient-text-csgo {
+    background: linear-gradient(135deg, #de9b35 0%, #f5a623 50%, #4b69ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+  }
+
+  .glass-card-hover {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card-hover:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .btn-pill {
+    background: #ffffff;
+    color: #000000;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-pill:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 40px rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c471f5 50%, #7b68ee 100%);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(196, 113, 245, 0.3);
+  }
+
+  .btn-gradient:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 30px rgba(196, 113, 245, 0.4);
+  }
+
+  .input-clean {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .input-clean::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .input-clean:focus {
+    outline: none;
+    border-color: rgba(196, 113, 245, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 4px rgba(196, 113, 245, 0.1);
+  }
+
+  select.input-clean {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    padding-right: 3rem;
+  }
+
+  select.input-clean option {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 12px 16px;
+  }
+
+  .skin-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .skin-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 40px rgba(255, 107, 157, 0.3);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 40px rgba(196, 113, 245, 0.3);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+
+  .badge-tier-select { background: rgba(90, 159, 212, 0.15); border-color: rgba(90, 159, 212, 0.3); color: #5a9fd4; }
+  .badge-tier-deluxe { background: rgba(0, 149, 135, 0.15); border-color: rgba(0, 149, 135, 0.3); color: #009587; }
+  .badge-tier-premium { background: rgba(209, 84, 141, 0.15); border-color: rgba(209, 84, 141, 0.3); color: #d1548d; }
+  .badge-tier-ultra { background: rgba(250, 214, 99, 0.15); border-color: rgba(250, 214, 99, 0.3); color: #fad663; }
+  .badge-tier-exclusive { background: rgba(249, 166, 70, 0.15); border-color: rgba(249, 166, 70, 0.3); color: #f9a646; }
+
+  .rating-excellent { background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: #10b981; }
+  .rating-good { background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.3); color: #22c55e; }
+  .rating-okay { background: rgba(234, 179, 8, 0.15); border-color: rgba(234, 179, 8, 0.3); color: #eab308; }
+  .rating-poor { background: rgba(249, 115, 22, 0.15); border-color: rgba(249, 115, 22, 0.3); color: #f97316; }
+  .rating-terrible { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.3); color: #ef4444; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; opacity: 0; }
+.stagger-2 { animation-delay: 0.2s; opacity: 0; }
+.stagger-3 { animation-delay: 0.3s; opacity: 0; }
+.stagger-4 { animation-delay: 0.4s; opacity: 0; }
+.stagger-5 { animation-delay: 0.5s; opacity: 0; }
