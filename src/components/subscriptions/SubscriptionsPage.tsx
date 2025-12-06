@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, CreditCard, DollarSign, Calendar, Bell, Power, PowerOff } from 'lucide-react';
+import { Plus, CreditCard, DollarSign, Calendar, Bell, Power } from 'lucide-react';
 import { SubscriptionCard } from './SubscriptionCard';
 import { SubscriptionForm } from './SubscriptionForm';
 import { Modal } from '../ui/Modal';

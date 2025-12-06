@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import { Bell, X, Calendar, Percent, ExternalLink } from 'lucide-react';
+import { Bell, Calendar, Percent } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UPCOMING_SALES, SaleNotification } from '../../types/notifications';
-import { daysUntil, formatDate } from '../../lib/utils';
+import { daysUntil } from '../../lib/utils';
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);

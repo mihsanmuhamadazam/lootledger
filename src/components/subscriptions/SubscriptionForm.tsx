@@ -59,7 +59,6 @@ export function SubscriptionForm({ subscription, onSubmit, onCancel, isLoading }
   useEffect(() => {
     if (startDate && !subscription) {
       const start = new Date(startDate);
-      let renewalMs = start.getTime();
       
       switch (billingCycle) {
         case 'monthly':

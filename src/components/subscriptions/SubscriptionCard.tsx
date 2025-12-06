@@ -7,7 +7,7 @@ import { SubscriptionForm } from './SubscriptionForm';
 import { formatRM, formatDate, daysUntil, getSubscriptionServiceInfo } from '../../lib/utils';
 import { useSubscriptions } from '../../hooks/useSubscriptions';
 import { useToast } from '../ui/Toast';
-import type { GamingSubscription } from '../../types';
+import type { GamingSubscription, SubscriptionService } from '../../types';
 
 interface SubscriptionCardProps {
   subscription: GamingSubscription;
@@ -23,7 +23,16 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
   const daysToRenewal = daysUntil(subscription.renewalDate);
   const isRenewingSoon = daysToRenewal <= 7 && daysToRenewal >= 0;
 
-  const handleUpdate = async (data: Parameters<typeof updateSubscription>[0]) => {
+  const handleUpdate = async (data: {
+    service: SubscriptionService;
+    tier: string;
+    monthlyCostRM: number;
+    billingCycle: 'monthly' | 'quarterly' | 'yearly';
+    startDate: string;
+    renewalDate: string;
+    autoRenew: boolean;
+    active: boolean;
+  }) => {
     try {
       await updateSubscription({ ...subscription, ...data });
       showToast('Subscription updated', 'success');
