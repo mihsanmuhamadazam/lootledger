@@ -43,7 +43,7 @@ export async function getDB(): Promise<IDBPDatabase<LootLedgerDB>> {
   if (dbInstance) return dbInstance;
 
   dbInstance = await openDB<LootLedgerDB>(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion) {
+    upgrade(db) {
       // Users store
       if (!db.objectStoreNames.contains('users')) {
         const userStore = db.createObjectStore('users', { keyPath: 'id' });

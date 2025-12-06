@@ -7,7 +7,7 @@ import { ValorantSkinForm } from './ValorantSkinForm';
 import { formatRM, formatVP, getValorantTierInfo } from '../../lib/utils';
 import { useValorant } from '../../hooks/useValorant';
 import { useToast } from '../ui/Toast';
-import type { ValorantSkin } from '../../types';
+import type { ValorantSkin, ValorantTier } from '../../types';
 
 interface ValorantSkinCardProps {
   skin: ValorantSkin;
@@ -21,7 +21,17 @@ export function ValorantSkinCard({ skin }: ValorantSkinCardProps) {
 
   const tierInfo = getValorantTierInfo(skin.tier);
 
-  const handleUpdate = async (data: Parameters<typeof updateSkin>[0]) => {
+  const handleUpdate = async (data: {
+    skinId: string;
+    name: string;
+    weapon: string;
+    collection: string;
+    tier: ValorantTier;
+    variant?: string;
+    vpCost: number;
+    pricePaidRM: number;
+    acquiredDate: string;
+  }) => {
     try {
       await updateSkin({ ...skin, ...data });
       showToast('Skin updated successfully', 'success');

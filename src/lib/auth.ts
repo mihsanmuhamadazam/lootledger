@@ -1,10 +1,9 @@
-import { createUser, getUserByEmail, getUserById, generateId } from './db';
+import { createUser, getUserByEmail, generateId, generateShareCode } from './db';
 import type { User } from '../types';
 
-const SESSION_KEY = 'cardspend_session';
-
-// Hash password using SHA-256
-export async function hashPassword(password: string): Promise<string> {
+// Simple hash function for demo purposes
+// In production, use proper hashing like bcrypt
+async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -12,75 +11,44 @@ export async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Compare password with hash
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const passwordHash = await hashPassword(password);
-  return passwordHash === hash;
-}
-
-// Sign up new user
-export async function signUp(email: string, name: string, password: string): Promise<User> {
+export async function signUp(
+  email: string,
+  password: string,
+  name: string
+): Promise<User> {
   // Check if user already exists
   const existingUser = await getUserByEmail(email);
   if (existingUser) {
-    throw new Error('A user with this email already exists');
+    throw new Error('Email already registered');
   }
 
   const passwordHash = await hashPassword(password);
+  
   const user: User = {
     id: generateId(),
-    email: email.toLowerCase().trim(),
-    name: name.trim(),
+    email,
+    name,
     passwordHash,
+    shareCode: generateShareCode(),
     createdAt: new Date().toISOString(),
   };
 
-  await createUser(user);
-  saveSession(user.id);
-  return user;
+  return createUser(user);
 }
 
-// Sign in existing user
-export async function signIn(email: string, password: string): Promise<User> {
-  const user = await getUserByEmail(email.toLowerCase().trim());
+export async function signIn(
+  email: string,
+  password: string
+): Promise<User> {
+  const user = await getUserByEmail(email);
   if (!user) {
     throw new Error('Invalid email or password');
   }
 
-  const isValid = await verifyPassword(password, user.passwordHash);
-  if (!isValid) {
+  const passwordHash = await hashPassword(password);
+  if (user.passwordHash !== passwordHash) {
     throw new Error('Invalid email or password');
   }
 
-  saveSession(user.id);
   return user;
-}
-
-// Sign out
-export function signOut(): void {
-  localStorage.removeItem(SESSION_KEY);
-}
-
-// Save session to localStorage
-function saveSession(userId: string): void {
-  localStorage.setItem(SESSION_KEY, userId);
-}
-
-// Get current session
-export function getSession(): string | null {
-  return localStorage.getItem(SESSION_KEY);
-}
-
-// Get current user from session
-export async function getCurrentUser(): Promise<User | null> {
-  const userId = getSession();
-  if (!userId) return null;
-
-  const user = await getUserById(userId);
-  return user || null;
-}
-
-// Check if user is authenticated
-export function isAuthenticated(): boolean {
-  return !!getSession();
 }
