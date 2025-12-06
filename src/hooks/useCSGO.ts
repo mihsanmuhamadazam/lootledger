@@ -1,20 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getCSGOSkinsByUserId, createCSGOSkin, updateCSGOSkin, deleteCSGOSkin, generateId } from '../lib/db';
 import { useAuth } from '../context/AuthContext';
+import {
+  getCSGOSkinsByUserId,
+  createCSGOSkin,
+  updateCSGOSkin,
+  deleteCSGOSkin,
+  generateId,
+} from '../lib/db';
 import type { CSGOSkin, CSGOWear } from '../types';
-import { useMemo } from 'react';
 
 export function useCSGO() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const skinsQuery = useQuery({
+  const { data: skins = [], isLoading } = useQuery({
     queryKey: ['csgoSkins', user?.id],
     queryFn: () => getCSGOSkinsByUserId(user!.id),
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  const addSkinMutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: async (data: {
       name: string;
       weapon: string;
@@ -27,27 +32,37 @@ export function useCSGO() {
       acquiredDate: string;
     }) => {
       if (!user) throw new Error('Not authenticated');
-      const skin: CSGOSkin = {
+      
+      const newSkin: CSGOSkin = {
         id: generateId(),
-        userId: user.id,
-        ...data,
+        odId: user.id,
+        name: data.name,
+        weapon: data.weapon,
+        skinName: data.skinName,
+        wear: data.wear,
+        statTrak: data.statTrak,
+        floatValue: data.floatValue,
+        pricePaidRM: data.pricePaidRM,
+        currentMarketPriceRM: data.currentMarketPriceRM,
+        acquiredDate: data.acquiredDate,
         createdAt: new Date().toISOString(),
       };
-      return createCSGOSkin(skin);
+      
+      return createCSGOSkin(newSkin);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['csgoSkins', user?.id] });
     },
   });
 
-  const updateSkinMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: updateCSGOSkin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['csgoSkins', user?.id] });
     },
   });
 
-  const deleteSkinMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteCSGOSkin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['csgoSkins', user?.id] });
@@ -55,47 +70,30 @@ export function useCSGO() {
   });
 
   // Calculate stats
-  const stats = useMemo(() => {
-    const skins = skinsQuery.data || [];
-    const totalPaidRM = skins.reduce((sum, s) => sum + s.pricePaidRM, 0);
-    const currentValueRM = skins.reduce((sum, s) => sum + s.currentMarketPriceRM, 0);
-    const profitLossRM = currentValueRM - totalPaidRM;
-    const profitLossPercent = totalPaidRM > 0 ? ((profitLossRM / totalPaidRM) * 100) : 0;
-
-    // Count by weapon
-    const byWeapon = skins.reduce((acc, s) => {
-      acc[s.weapon] = (acc[s.weapon] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Count StatTrak items
-    const statTrakCount = skins.filter(s => s.statTrak).length;
-
-    // Most valuable items
-    const topSkins = [...skins].sort((a, b) => b.currentMarketPriceRM - a.currentMarketPriceRM).slice(0, 5);
-
-    return {
-      totalSkins: skins.length,
-      totalPaidRM,
-      currentValueRM,
-      profitLossRM,
-      profitLossPercent,
-      byWeapon,
-      statTrakCount,
-      topSkins,
-    };
-  }, [skinsQuery.data]);
+  const stats = {
+    totalSkins: skins.length,
+    totalPaidRM: skins.reduce((sum, s) => sum + s.pricePaidRM, 0),
+    currentValueRM: skins.reduce((sum, s) => sum + s.currentMarketPriceRM, 0),
+    profitLossRM: skins.reduce((sum, s) => sum + (s.currentMarketPriceRM - s.pricePaidRM), 0),
+    statTrakCount: skins.filter(s => s.statTrak).length,
+    wearBreakdown: {
+      fn: skins.filter(s => s.wear === 'fn').length,
+      mw: skins.filter(s => s.wear === 'mw').length,
+      ft: skins.filter(s => s.wear === 'ft').length,
+      ww: skins.filter(s => s.wear === 'ww').length,
+      bs: skins.filter(s => s.wear === 'bs').length,
+    },
+  };
 
   return {
-    skins: skinsQuery.data || [],
-    isLoading: skinsQuery.isLoading,
-    error: skinsQuery.error,
-    addSkin: addSkinMutation.mutateAsync,
-    updateSkin: updateSkinMutation.mutateAsync,
-    deleteSkin: deleteSkinMutation.mutateAsync,
-    isAdding: addSkinMutation.isPending,
-    isUpdating: updateSkinMutation.isPending,
-    isDeleting: deleteSkinMutation.isPending,
+    skins,
+    isLoading,
     stats,
+    addSkin: addMutation.mutateAsync,
+    updateSkin: updateMutation.mutateAsync,
+    deleteSkin: deleteMutation.mutateAsync,
+    isAdding: addMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 }

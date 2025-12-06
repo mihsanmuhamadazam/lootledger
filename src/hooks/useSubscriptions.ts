@@ -1,20 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getSubscriptionsByUserId, createSubscription, updateSubscription, deleteSubscription, generateId } from '../lib/db';
 import { useAuth } from '../context/AuthContext';
+import {
+  getSubscriptionsByUserId,
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
+  generateId,
+} from '../lib/db';
 import type { GamingSubscription, SubscriptionService } from '../types';
-import { useMemo } from 'react';
 
 export function useSubscriptions() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const subscriptionsQuery = useQuery({
+  const { data: subscriptions = [], isLoading } = useQuery({
     queryKey: ['subscriptions', user?.id],
     queryFn: () => getSubscriptionsByUserId(user!.id),
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  const addSubscriptionMutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: async (data: {
       service: SubscriptionService;
       tier: string;
@@ -26,80 +31,71 @@ export function useSubscriptions() {
       active: boolean;
     }) => {
       if (!user) throw new Error('Not authenticated');
-      const sub: GamingSubscription = {
+      
+      const newSub: GamingSubscription = {
         id: generateId(),
-        userId: user.id,
-        ...data,
+        odId: user.id,
+        service: data.service,
+        tier: data.tier,
+        monthlyCostRM: data.monthlyCostRM,
+        billingCycle: data.billingCycle,
+        startDate: data.startDate,
+        renewalDate: data.renewalDate,
+        autoRenew: data.autoRenew,
+        active: data.active,
         createdAt: new Date().toISOString(),
       };
-      return createSubscription(sub);
+      
+      return createSubscription(newSub);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions', user?.id] });
     },
   });
 
-  const updateSubscriptionMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: updateSubscription,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions', user?.id] });
     },
   });
 
-  const deleteSubscriptionMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteSubscription,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions', user?.id] });
     },
   });
 
+  // Active subscriptions
+  const activeSubscriptions = subscriptions.filter(s => s.active);
+
   // Calculate stats
-  const stats = useMemo(() => {
-    const subs = subscriptionsQuery.data || [];
-    const activeSubs = subs.filter(s => s.active);
-    
-    // Calculate monthly cost (normalize all to monthly)
-    const monthlyTotalRM = activeSubs.reduce((sum, s) => {
-      switch (s.billingCycle) {
-        case 'yearly':
-          return sum + (s.monthlyCostRM / 12);
-        case 'quarterly':
-          return sum + (s.monthlyCostRM / 3);
-        default:
-          return sum + s.monthlyCostRM;
-      }
-    }, 0);
-
-    // Calculate yearly cost
-    const yearlyTotalRM = monthlyTotalRM * 12;
-
-    // Get upcoming renewals (next 30 days)
-    const today = new Date();
-    const thirtyDaysLater = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const upcomingRenewals = activeSubs.filter(s => {
-      const renewalDate = new Date(s.renewalDate);
-      return renewalDate >= today && renewalDate <= thirtyDaysLater;
-    });
-
-    return {
-      totalSubscriptions: subs.length,
-      activeSubscriptions: activeSubs.length,
-      monthlyTotalRM,
-      yearlyTotalRM,
-      upcomingRenewals,
-    };
-  }, [subscriptionsQuery.data]);
+  const stats = {
+    totalSubscriptions: subscriptions.length,
+    activeSubscriptions: activeSubscriptions.length,
+    monthlyTotalRM: activeSubscriptions.reduce((sum, s) => sum + s.monthlyCostRM, 0),
+    yearlyTotalRM: activeSubscriptions.reduce((sum, s) => sum + (s.monthlyCostRM * 12), 0),
+    upcomingRenewals: subscriptions
+      .filter(s => s.active && s.autoRenew)
+      .filter(s => {
+        const renewalDate = new Date(s.renewalDate);
+        const today = new Date();
+        const daysUntil = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return daysUntil <= 7 && daysUntil >= 0;
+      }),
+  };
 
   return {
-    subscriptions: subscriptionsQuery.data || [],
-    isLoading: subscriptionsQuery.isLoading,
-    error: subscriptionsQuery.error,
-    addSubscription: addSubscriptionMutation.mutateAsync,
-    updateSubscription: updateSubscriptionMutation.mutateAsync,
-    deleteSubscription: deleteSubscriptionMutation.mutateAsync,
-    isAdding: addSubscriptionMutation.isPending,
-    isUpdating: updateSubscriptionMutation.isPending,
-    isDeleting: deleteSubscriptionMutation.isPending,
+    subscriptions,
+    activeSubscriptions,
+    isLoading,
     stats,
+    addSubscription: addMutation.mutateAsync,
+    updateSubscription: updateMutation.mutateAsync,
+    deleteSubscription: deleteMutation.mutateAsync,
+    isAdding: addMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 }

@@ -1,21 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getValorantSkinsByUserId, createValorantSkin, updateValorantSkin, deleteValorantSkin, generateId } from '../lib/db';
 import { useAuth } from '../context/AuthContext';
-import type { ValorantSkin, ValorantTier } from '../types';
-import { useMemo } from 'react';
+import {
+  getValorantSkinsByUserId,
+  createValorantSkin,
+  updateValorantSkin,
+  deleteValorantSkin,
+  generateId,
+} from '../lib/db';
 import { vpToRM } from '../lib/utils';
+import type { ValorantSkin, ValorantTier } from '../types';
 
 export function useValorant() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const skinsQuery = useQuery({
+  const { data: skins = [], isLoading } = useQuery({
     queryKey: ['valorantSkins', user?.id],
     queryFn: () => getValorantSkinsByUserId(user!.id),
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  const addSkinMutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: async (data: {
       skinId: string;
       name: string;
@@ -28,27 +33,37 @@ export function useValorant() {
       acquiredDate: string;
     }) => {
       if (!user) throw new Error('Not authenticated');
-      const skin: ValorantSkin = {
+      
+      const newSkin: ValorantSkin = {
         id: generateId(),
-        userId: user.id,
-        ...data,
+        odId: user.id,
+        skinId: data.skinId,
+        name: data.name,
+        weapon: data.weapon,
+        collection: data.collection,
+        tier: data.tier,
+        variant: data.variant,
+        vpCost: data.vpCost,
+        pricePaidRM: data.pricePaidRM,
+        acquiredDate: data.acquiredDate,
         createdAt: new Date().toISOString(),
       };
-      return createValorantSkin(skin);
+      
+      return createValorantSkin(newSkin);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['valorantSkins', user?.id] });
     },
   });
 
-  const updateSkinMutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: updateValorantSkin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['valorantSkins', user?.id] });
     },
   });
 
-  const deleteSkinMutation = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteValorantSkin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['valorantSkins', user?.id] });
@@ -56,51 +71,29 @@ export function useValorant() {
   });
 
   // Calculate stats
-  const stats = useMemo(() => {
-    const skins = skinsQuery.data || [];
-    const totalSpentRM = skins.reduce((sum, s) => sum + s.pricePaidRM, 0);
-    const totalVP = skins.reduce((sum, s) => sum + s.vpCost, 0);
-    
-    // Count by tier
-    const byTier = skins.reduce((acc, s) => {
-      acc[s.tier] = (acc[s.tier] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Count by weapon
-    const byWeapon = skins.reduce((acc, s) => {
-      acc[s.weapon] = (acc[s.weapon] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Count by collection
-    const byCollection = skins.reduce((acc, s) => {
-      acc[s.collection] = (acc[s.collection] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return {
-      totalSkins: skins.length,
-      totalSpentRM,
-      totalVP,
-      byTier,
-      byWeapon,
-      byCollection,
-      // Estimated account value based on VP cost
-      estimatedValueRM: vpToRM(totalVP),
-    };
-  }, [skinsQuery.data]);
+  const stats = {
+    totalSkins: skins.length,
+    totalVP: skins.reduce((sum, s) => sum + s.vpCost, 0),
+    totalSpentRM: skins.reduce((sum, s) => sum + s.pricePaidRM, 0),
+    estimatedValueRM: skins.reduce((sum, s) => sum + vpToRM(s.vpCost), 0),
+    tierBreakdown: {
+      select: skins.filter(s => s.tier === 'select').length,
+      deluxe: skins.filter(s => s.tier === 'deluxe').length,
+      premium: skins.filter(s => s.tier === 'premium').length,
+      ultra: skins.filter(s => s.tier === 'ultra').length,
+      exclusive: skins.filter(s => s.tier === 'exclusive').length,
+    },
+  };
 
   return {
-    skins: skinsQuery.data || [],
-    isLoading: skinsQuery.isLoading,
-    error: skinsQuery.error,
-    addSkin: addSkinMutation.mutateAsync,
-    updateSkin: updateSkinMutation.mutateAsync,
-    deleteSkin: deleteSkinMutation.mutateAsync,
-    isAdding: addSkinMutation.isPending,
-    isUpdating: updateSkinMutation.isPending,
-    isDeleting: deleteSkinMutation.isPending,
+    skins,
+    isLoading,
     stats,
+    addSkin: addMutation.mutateAsync,
+    updateSkin: updateMutation.mutateAsync,
+    deleteSkin: deleteMutation.mutateAsync,
+    isAdding: addMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 }
