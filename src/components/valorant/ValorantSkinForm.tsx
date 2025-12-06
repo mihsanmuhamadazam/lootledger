@@ -2,7 +2,7 @@ import { useState, FormEvent, useEffect, useMemo } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Search, Sparkles } from 'lucide-react';
-import { VALORANT_SKINS, VALORANT_BUNDLES, getCollections, getSkinsByCollection, vpToMYR } from '../../data/valorantSkins';
+import { VALORANT_SKINS, getCollections, getSkinsByCollection, vpToMYR } from '../../data/valorantSkins';
 import type { ValorantSkin, ValorantTier } from '../../types';
 import { formatRM, formatVP } from '../../lib/utils';
 
