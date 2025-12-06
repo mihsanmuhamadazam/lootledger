@@ -21,7 +21,12 @@ export function GameWorthCard({ entry }: GameWorthCardProps) {
 
   const ratingInfo = getWorthRatingInfo(entry.rating);
 
-  const handleUpdate = async (data: Parameters<typeof updateEntry>[0]) => {
+  const handleUpdate = async (data: {
+    gameName: string;
+    priceRM: number;
+    hoursToComplete: number;
+    notes?: string;
+  }) => {
     try {
       await updateEntry({ ...entry, ...data });
       showToast('Entry updated', 'success');

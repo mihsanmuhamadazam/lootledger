@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, TrendingUp, TrendingDown, ChevronRight } from 'lucide-react';
+import { Search, TrendingUp } from 'lucide-react';
 import { CSGO_SKINS, CSGO_WEAPONS, WEAR_NAMES, getStatTrakPrice } from '../../data/csgoSkins';
 import { formatRM } from '../../lib/utils';
 import type { CSGOWear } from '../../types';
@@ -8,7 +8,7 @@ interface CSGOSkinBrowserProps {
   onClose: () => void;
 }
 
-export function CSGOSkinBrowser({ onClose }: CSGOSkinBrowserProps) {
+export function CSGOSkinBrowser({ onClose: _onClose }: CSGOSkinBrowserProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedWeapon, setSelectedWeapon] = useState('');
   const [selectedWear, setSelectedWear] = useState<CSGOWear>('ft');

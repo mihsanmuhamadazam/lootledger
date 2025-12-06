@@ -25,7 +25,17 @@ export function CSGOSkinCard({ skin }: CSGOSkinCardProps) {
   const percentChange = getPercentChange(skin.currentMarketPriceRM, skin.pricePaidRM);
   const isProfit = profitLoss >= 0;
 
-  const handleUpdate = async (data: Parameters<typeof updateSkin>[0]) => {
+  const handleUpdate = async (data: {
+    name: string;
+    weapon: string;
+    skinName: string;
+    wear: CSGOSkin['wear'];
+    statTrak: boolean;
+    floatValue?: number;
+    pricePaidRM: number;
+    currentMarketPriceRM: number;
+    acquiredDate: string;
+  }) => {
     try {
       await updateSkin({ ...skin, ...data });
       showToast('Skin updated successfully', 'success');

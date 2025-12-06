@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Users, UserPlus, Copy, Share2, X, Trash2, Crown, Medal } from 'lucide-react';
+import { Trophy, Users, UserPlus, Copy, Share2, Trash2, Crown, Medal } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
@@ -43,8 +43,9 @@ export function LeaderboardPage() {
       showToast('Friend added!', 'success');
       setShareCode('');
       setIsAddFriendOpen(false);
-    } catch (err: any) {
-      showToast(err.message || 'Failed to add friend', 'error');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to add friend';
+      showToast(message, 'error');
     }
   };
 

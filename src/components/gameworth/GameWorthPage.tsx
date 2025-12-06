@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calculator, DollarSign, Clock, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Plus, Calculator, DollarSign, Clock, ThumbsUp } from 'lucide-react';
 import { GameWorthCard } from './GameWorthCard';
 import { GameWorthForm } from './GameWorthForm';
 import { Modal } from '../ui/Modal';
