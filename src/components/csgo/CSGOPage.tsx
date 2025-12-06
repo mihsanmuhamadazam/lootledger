@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Target, DollarSign, Package, TrendingUp, TrendingDown, Search } from 'lucide-react';
+import { Plus, Target, DollarSign, Package, TrendingUp, TrendingDown, Search, Zap } from 'lucide-react';
 import { CSGOSkinCard } from './CSGOSkinCard';
 import { CSGOSkinForm } from './CSGOSkinForm';
 import { CSGOSkinBrowser } from './CSGOSkinBrowser';
@@ -109,8 +109,8 @@ export function CSGOPage() {
           style={{ '--accent-color': '#ffd700' } as React.CSSProperties}
         >
           <div className="flex items-center gap-3 mb-2">
-            <DollarSign className="w-5 h-5 text-[#ffd700]" />
-            <span className="text-white/50 text-sm">Inventory Value</span>
+            <TrendingUp className="w-5 h-5 text-[#ffd700]" />
+            <span className="text-white/50 text-sm">Market Value</span>
           </div>
           <p className="text-2xl font-bold font-orbitron text-[#ffd700]">{formatRM(stats.currentValueRM)}</p>
         </motion.div>
@@ -119,7 +119,7 @@ export function CSGOPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className={`stat-card`}
+          className="stat-card"
           style={{ '--accent-color': isProfit ? '#22c55e' : '#ef4444' } as React.CSSProperties}
         >
           <div className="flex items-center gap-3 mb-2">
@@ -133,9 +133,6 @@ export function CSGOPage() {
           <p className={`text-2xl font-bold font-orbitron ${isProfit ? 'text-green-500' : 'text-red-500'}`}>
             {isProfit ? '+' : ''}{formatRM(stats.profitLossRM)}
           </p>
-          <p className={`text-sm ${isProfit ? 'text-green-400' : 'text-red-400'}`}>
-            {isProfit ? '+' : ''}{stats.profitLossPercent.toFixed(1)}%
-          </p>
         </motion.div>
 
         <motion.div
@@ -143,13 +140,13 @@ export function CSGOPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="stat-card"
-          style={{ '--accent-color': '#8847ff' } as React.CSSProperties}
+          style={{ '--accent-color': '#eb4b4b' } as React.CSSProperties}
         >
           <div className="flex items-center gap-3 mb-2">
-            <Target className="w-5 h-5 text-[#8847ff]" />
+            <Zap className="w-5 h-5 text-[#eb4b4b]" />
             <span className="text-white/50 text-sm">StatTrak™</span>
           </div>
-          <p className="text-2xl font-bold font-orbitron text-[#8847ff]">{stats.statTrakCount}</p>
+          <p className="text-2xl font-bold font-orbitron text-white">{stats.statTrakCount}</p>
         </motion.div>
       </div>
 
@@ -160,19 +157,25 @@ export function CSGOPage() {
           animate={{ opacity: 1, y: 0 }}
           className="glass-card p-12 text-center"
         >
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#de9b35]/20 to-[#4b69ff]/20 flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#de9b35]/20 to-[#f5a623]/20 flex items-center justify-center mx-auto mb-6">
             <Target className="w-10 h-10 text-[#de9b35]" />
           </div>
           <h2 className="text-xl font-bold font-orbitron text-white mb-2">
-            No skins in inventory
+            Empty Inventory
           </h2>
           <p className="text-white/50 mb-6 max-w-sm mx-auto">
-            Start tracking your CS:GO/CS2 skins to see your inventory value and profit/loss!
+            Start tracking your CS:GO skins, knives, and gloves. Monitor market values and your profit/loss!
           </p>
-          <Button variant="csgo" onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Your First Skin
-          </Button>
+          <div className="flex gap-3 justify-center">
+            <Button variant="ghost" onClick={() => setIsBrowseOpen(true)}>
+              <Search className="w-4 h-4 mr-2" />
+              Browse Skins
+            </Button>
+            <Button variant="csgo" onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Your First Skin
+            </Button>
+          </div>
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -189,7 +192,8 @@ export function CSGOPage() {
         </div>
       )}
 
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add CS:GO Skin">
+      {/* Add Skin Modal */}
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add CS:GO Skin" size="lg">
         <CSGOSkinForm
           onSubmit={handleAddSkin}
           onCancel={() => setIsAddModalOpen(false)}
@@ -197,12 +201,10 @@ export function CSGOPage() {
         />
       </Modal>
 
-      {/* Skin Browser */}
-      {isBrowseOpen && (
-        <CSGOSkinBrowser 
-          onClose={() => setIsBrowseOpen(false)} 
-        />
-      )}
+      {/* Browse Skins Modal */}
+      <Modal isOpen={isBrowseOpen} onClose={() => setIsBrowseOpen(false)} title="Browse Skin Prices" size="lg">
+        <CSGOSkinBrowser onClose={() => setIsBrowseOpen(false)} />
+      </Modal>
     </div>
   );
 }
