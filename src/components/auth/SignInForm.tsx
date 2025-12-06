@@ -1,24 +1,20 @@
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Gamepad2 } from 'lucide-react';
+import { Gamepad2, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../ui/Toast';
-import { Button } from '../ui/Button';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, isAuthenticated } = useAuth();
-  const { showToast } = useToast();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate({ to: '/' });
-    }
-  }, [isAuthenticated, navigate]);
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,10 +22,10 @@ export function SignInForm() {
 
     try {
       await signIn(email, password);
-      showToast('Welcome back, gamer! 🎮', 'success');
+      showToast('Welcome back!', 'success');
       navigate({ to: '/' });
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Sign in failed', 'error');
+    } catch (error: any) {
+      showToast(error.message || 'Sign in failed', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -39,64 +35,63 @@ export function SignInForm() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="w-full max-w-md mx-auto"
+      className="w-full max-w-md"
     >
       <div className="glass-card p-8">
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ff6b9d] to-[#c471f5] flex items-center justify-center mx-auto mb-4 shadow-lg glow-purple">
-            <Gamepad2 className="w-10 h-10 text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ff6b9d] to-[#c471f5] flex items-center justify-center mx-auto mb-4 glow-purple">
+            <Gamepad2 className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold font-orbitron gradient-text">
-            LootLedger
-          </h1>
-          <p className="text-white/50 mt-2">
-            Sign in to track your gaming loot
-          </p>
+          <h1 className="text-2xl font-bold font-orbitron gradient-text">LootLedger</h1>
+          <p className="text-white/50 mt-2">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 pointer-events-none" />
-            <input
+            <Mail className="absolute left-4 top-10 w-5 h-5 text-white/40" />
+            <Input
+              label="Email"
               type="email"
-              placeholder="Email address"
+              placeholder="gamer@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-clean pl-12"
+              className="pl-12"
               required
             />
           </div>
 
           <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 pointer-events-none" />
-            <input
-              type="password"
-              placeholder="Password"
+            <Lock className="absolute left-4 top-10 w-5 h-5 text-white/40" />
+            <Input
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-clean pl-12"
+              className="pl-12 pr-12"
               required
-              minLength={6}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-10 text-white/40 hover:text-white/60"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
           </div>
 
-          <Button type="submit" isLoading={isLoading} className="w-full">
-            Enter the Lobby
+          <Button type="submit" variant="primary" isLoading={isLoading} className="w-full">
+            Sign In
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-white/50">
-            New player?{' '}
-            <Link
-              to="/auth/signup"
-              className="text-[#00d4ff] hover:text-[#ff6b9d] font-medium transition-colors"
-            >
-              Create account
-            </Link>
-          </p>
-        </div>
+        <p className="text-center text-white/50 mt-6">
+          Don't have an account?{' '}
+          <Link to="/auth/signup" className="text-[#ff6b9d] hover:underline font-medium">
+            Sign up
+          </Link>
+        </p>
       </div>
     </motion.div>
   );
